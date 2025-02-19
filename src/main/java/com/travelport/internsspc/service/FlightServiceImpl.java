@@ -1,0 +1,39 @@
+package com.travelport.internsspc.service;
+
+import com.travelport.internsspc.controller.model.Flight;
+import com.travelport.internsspc.repository.FlightRepository;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class FlightServiceImpl implements FlightService {
+
+  private final FlightRepository flightRepository;
+
+  @Override
+  public List<Flight> getFlights(
+      String departureAirports, String arrivalAirports, String departureDate) {
+    var departureList = getAirports(departureAirports);
+    var arrivalList = getAirports(arrivalAirports);
+    checkAirports(departureList, arrivalList);
+
+    return flightRepository.getFlights(
+        departureList, arrivalList, LocalDateTime.parse(departureDate));
+  }
+
+  private void checkAirports(List<String> departureAirports, List<String> arrivalAirports) {
+    // logic to check if departure and arrival airports are the same
+
+    if (departureAirports.equalsIgnoreCase(arrivalAirports)) {
+      throw new IllegalArgumentException("Departure and arrival airports cannot be the same");
+    }
+  }
+
+  private List<String> getAirports(String airports) {
+    return Arrays.asList(airports.split(","));
+  }
+}

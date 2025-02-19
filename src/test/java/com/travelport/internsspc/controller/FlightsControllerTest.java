@@ -4,18 +4,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.travelport.internsspc.controller.model.DepartureArrival;
-import com.travelport.internsspc.controller.model.Emissions;
-import com.travelport.internsspc.controller.model.Fare;
-import com.travelport.internsspc.controller.model.FareProperties;
-import com.travelport.internsspc.controller.model.Flight;
-import com.travelport.internsspc.controller.model.Segment;
 import com.travelport.internsspc.service.FlightService;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.IntStream;
+import com.travelport.internsspc.util.TestDataGenerator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -41,7 +31,7 @@ class FlightsControllerTest {
     var departureDate = "2025-08-01";
 
     Mockito.when(flightService.getFlights(departureAirport, arrivalAirport, departureDate))
-        .thenReturn(createFakeFlights(5));
+        .thenReturn(TestDataGenerator.createFakeFlights(5));
 
     mvc.perform(
             get("/flights")
@@ -121,59 +111,4 @@ class FlightsControllerTest {
         .andExpect(jsonPath("$.message").exists());
   }
 
-  private static List<Flight> createFakeFlights(int num) {
-    return IntStream.range(0, num).mapToObj(i -> createFakeFlight()).toList();
-  }
-
-  private static Flight createFakeFlight() {
-    var flight = new Flight();
-    flight.setIdentifier(UUID.randomUUID());
-    flight.setAirlineCode("IB");
-    flight.setSegments(createFakeSegments(2));
-    flight.setFares(createFakeFares(2));
-    return flight;
-  }
-
-  private static List<Segment> createFakeSegments(int num) {
-    return IntStream.range(0, num).mapToObj(i -> createFakeSegment()).toList();
-  }
-
-  private static Segment createFakeSegment() {
-    var segment = new Segment();
-    segment.setIdentifier(UUID.randomUUID().toString());
-    segment.setAirline("IB");
-    segment.setAircraft("Airbus A320");
-    segment.setArrival(createFakeSegmentLocation());
-    segment.setDeparture(createFakeSegmentLocation());
-    return segment;
-  }
-
-  private static DepartureArrival createFakeSegmentLocation() {
-    var departureArrival = new DepartureArrival();
-    departureArrival.setAirport("BCN");
-    departureArrival.setTime(LocalDateTime.now());
-    departureArrival.setTerminal("T2");
-    return departureArrival;
-  }
-
-  private static List<Fare> createFakeFares(int num) {
-    return IntStream.range(0, num).mapToObj(i -> createFakeFare()).toList();
-  }
-
-  private static Fare createFakeFare() {
-    var fare = new Fare();
-    fare.setIdentifier(UUID.randomUUID().toString());
-    fare.setName("Tarifa plana");
-    fare.setEmissions(createFakeEmissions());
-    fare.setProperties(new FareProperties());
-    fare.setPrice(BigDecimal.TEN);
-    return fare;
-  }
-
-  private static Emissions createFakeEmissions() {
-    var emissions = new Emissions();
-    emissions.setCurrent(BigDecimal.ONE);
-    emissions.setTypical(BigDecimal.TEN);
-    return emissions;
-  }
 }

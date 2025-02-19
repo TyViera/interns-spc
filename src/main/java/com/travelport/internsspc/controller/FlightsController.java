@@ -41,6 +41,7 @@ public class FlightsController {
       @RequestParam String departureAirports,
       @RequestParam String arrivalAirports,
       @RequestParam String departureDate) {
+    // -> verify data
     return flightService.getFlights(departureAirports, arrivalAirports, departureDate);
   }
 
