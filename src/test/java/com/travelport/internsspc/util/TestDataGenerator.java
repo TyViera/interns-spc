@@ -1,20 +1,37 @@
 package com.travelport.internsspc.util;
 
+import net.datafaker.Faker;
+
 import com.travelport.internsspc.controller.model.DepartureArrival;
 import com.travelport.internsspc.controller.model.Emissions;
 import com.travelport.internsspc.controller.model.Fare;
 import com.travelport.internsspc.controller.model.FareProperties;
 import com.travelport.internsspc.controller.model.Flight;
 import com.travelport.internsspc.controller.model.Segment;
+import com.travelport.internsspc.db.entities.FlightEntity;
+import com.travelport.internsspc.db.entities.SegmentEntity;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class TestDataGenerator {
+
+  public static final String VALID_SINGLE_DEPARTURE_AIRPORT = "LAX";
+  public static final String VALID_SINGLE_ARRIVAL_AIRPORT = "MXN";
+
+  public static final String VALID_MULTIPLE_DEPARTURE_AIRPORT_JOINED = "BCN,MAD";
+  public static final List<String> VALID_MULTIPLE_DEPARTURE_AIRPORT = List.of("BCN", "MAD");
+
+  public static final String VALID_MULTIPLE_ARRIVAL_AIRPORT_JOINED = "JFK,LAX";
+  public static final List<String> VALID_MULTIPLE_ARRIVAL_AIRPORT = List.of("JFK", "LAX");
+
+  public static final String VALID_DEPARTURE_DATE = "2025-12-24T12:00:00";
+  public static final Faker FAKER = new Faker();
 
   public static List<Flight> createFakeFlights(int num) {
     return IntStream.range(0, num).mapToObj(i -> createFakeFlight()).toList();
@@ -70,5 +87,33 @@ public class TestDataGenerator {
     emissions.setCurrent(BigDecimal.ONE);
     emissions.setTypical(BigDecimal.TEN);
     return emissions;
+  }
+
+  public static List<FlightEntity> createFakeFlightEntities(int num) {
+    return IntStream.range(0, num).mapToObj(i -> createFakeFlightEntity()).toList();
+  }
+
+  public static FlightEntity createFakeFlightEntity() {
+    var entity = new FlightEntity();
+    entity.setId(UUID.randomUUID().toString());
+    entity.setArrivalAirportCode(FAKER.aviation().airport());
+    entity.setDepartureAirportCode(FAKER.aviation().airport());
+    return entity;
+  }
+
+  public static List<SegmentEntity> createFakeSegmentsEntities(int num) {
+    return IntStream.range(0, num).mapToObj(i -> createFakeSegmentEntity()).toList();
+  }
+
+  public static SegmentEntity createFakeSegmentEntity() {
+    var entity = new SegmentEntity();
+    entity.setId(UUID.randomUUID().toString());
+    entity.setSegmentCode(FAKER.aviation().flight());
+    entity.setAirlineCode(FAKER.aviation().airline());
+    entity.setDepartureAirportCode(FAKER.aviation().airport());
+    entity.setDepartureDate(FAKER.date().future(2, TimeUnit.DAYS).toLocalDateTime());
+    entity.setArrivalAirportCode(FAKER.aviation().airport());
+    entity.setArrivalDate(FAKER.date().future(2, TimeUnit.DAYS).toLocalDateTime());
+    return entity;
   }
 }

@@ -1,6 +1,9 @@
 package com.travelport.internsspc.controller;
 
+import com.travelport.internsspc.controller.model.ApiError;
 import com.travelport.internsspc.controller.model.Flight;
+import com.travelport.internsspc.exceptions.ApiException;
+import com.travelport.internsspc.exceptions.NotFoundException;
 import com.travelport.internsspc.service.FlightService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -8,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -62,6 +66,25 @@ public class FlightsController {
             }),
       })
   public Flight getFlightById(@PathVariable String flightId) {
-    return null;
+    return flightService
+        .getFlightById(flightId)
+        .orElseThrow(() -> new ApiException(404, "ER0004", "Flight not found"));
+  }
+
+  public ResponseEntity<Object> getFlightById2(String flightId) {
+    return flightService
+        .getFlightById(flightId)
+        .map(this::createBody)
+        .orElseGet(
+            () -> {
+              var error = new ApiError();
+              error.setCode("ER0004");
+              error.setMessage("Flight not found");
+              return ResponseEntity.status(404).body(error);
+            });
+  }
+
+  private ResponseEntity<Object> createBody(Object body) {
+    return ResponseEntity.ok(body);
   }
 }

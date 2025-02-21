@@ -1,5 +1,12 @@
 package com.travelport.internsspc.service;
 
+import static com.travelport.internsspc.util.TestDataGenerator.VALID_DEPARTURE_DATE;
+import static com.travelport.internsspc.util.TestDataGenerator.VALID_MULTIPLE_ARRIVAL_AIRPORT;
+import static com.travelport.internsspc.util.TestDataGenerator.VALID_MULTIPLE_ARRIVAL_AIRPORT_JOINED;
+import static com.travelport.internsspc.util.TestDataGenerator.VALID_MULTIPLE_DEPARTURE_AIRPORT;
+import static com.travelport.internsspc.util.TestDataGenerator.VALID_MULTIPLE_DEPARTURE_AIRPORT_JOINED;
+import static com.travelport.internsspc.util.TestDataGenerator.VALID_SINGLE_ARRIVAL_AIRPORT;
+import static com.travelport.internsspc.util.TestDataGenerator.VALID_SINGLE_DEPARTURE_AIRPORT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
@@ -17,17 +24,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class FlightServiceImplTest {
-
-  private static final String VALID_SINGLE_DEPARTURE_AIRPORT = "LAX";
-  private static final String VALID_SINGLE_ARRIVAL_AIRPORT = "MXN";
-
-  private static final String VALID_MULTIPLE_DEPARTURE_AIRPORT_JOINED = "BCN,MAD";
-  private static final List<String> VALID_MULTIPLE_DEPARTURE_AIRPORT = List.of("BCN", "MAD");
-
-  private static final String VALID_MULTIPLE_ARRIVAL_AIRPORT_JOINED = "JFK,LAX";
-  private static final List<String> VALID_MULTIPLE_ARRIVAL_AIRPORT = List.of("JFK", "LAX");
-
-  private static final String VALID_DEPARTURE_DATE = "2025-12-24T12:00:00";
 
   @InjectMocks private FlightServiceImpl flightService;
   @Mock private FlightRepository flightRepository;
@@ -66,13 +62,25 @@ class FlightServiceImplTest {
 
   @Test
   @DisplayName("When receive same values for airports then throws exception")
-  void checkFlightsDepartureAndArrivalSuccessTest() {
+  void checkFlightsDepartureAndArrivalSingleErrorTest() {
     assertThrows(
         Exception.class,
         () ->
             flightService.getFlights(
                 VALID_SINGLE_DEPARTURE_AIRPORT,
                 VALID_SINGLE_DEPARTURE_AIRPORT,
+                VALID_DEPARTURE_DATE));
+  }
+
+  @Test
+  @DisplayName("When receive same values for airports then throws exception")
+  void checkFlightsDepartureAndArrivalMultipleErrorTest() {
+    assertThrows(
+        Exception.class,
+        () ->
+            flightService.getFlights(
+                VALID_MULTIPLE_DEPARTURE_AIRPORT_JOINED,
+                VALID_MULTIPLE_DEPARTURE_AIRPORT_JOINED,
                 VALID_DEPARTURE_DATE));
   }
 }
